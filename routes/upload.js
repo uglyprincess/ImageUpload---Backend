@@ -2,14 +2,18 @@ const express = require("express");
 const router = express.Router();
 const Image = require("../models/image");
 const multer = require("multer");
+const {v4: uuidv4} = require("uuid");
+
+var useName = "";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb (null, 'uploads');
+        cb (null, '../frontend/public/uploads');
     },
 
     filename: (req, file, cb) => {
-        cb (null, file.filename + '_' + Date.now() + '.jpg');
+        useName = req.body.name + '_' + uuidv4() + '.jpg'
+        cb (null, useName);
     }
 });
 
@@ -21,11 +25,13 @@ router.get("/", function(req, res){
 
 router.post("/", upload.single('image'), function(req, res){
 
+    console.log(req.file.filename);
+
     var obj = new Image({
         name: req.body.name,
         desc: req.body.desc,
         img: {
-            data: req.file.filename,
+            data: useName,
             contentType: "image/png"
         }
     });
